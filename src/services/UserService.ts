@@ -24,6 +24,7 @@ class UserService {
         birthDate: birthDateObj,
         email: data.email,
         password: hashed,
+         // Для демонстрации роли берём из клиента, но обычно здесь всегда 'USER'
         role: data.role || 'USER',
         isActive: true,
       },
