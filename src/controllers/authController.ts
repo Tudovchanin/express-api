@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { generateToken } from '../utils/authUtils';
 
-import  userService  from '../services/UserService';
+import  UserService  from '../services/UserService';
+import { prismaUserRepository } from '../repositories/prisma-repository';
 
+const userService = new UserService(prismaUserRepository);
 
 
 

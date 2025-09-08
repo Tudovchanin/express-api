@@ -1,9 +1,11 @@
 import { prisma } from '../prismaClient';
 import argon2 from 'argon2';
 
-import type { CreateUserData} from '../types';
+import type { CreateUserData, UserRepository} from '../types';
+
 
 class UserService {
+  constructor(private userRepository: UserRepository) {}
 
   async createUser(data: CreateUserData) {
 
@@ -82,8 +84,7 @@ class UserService {
     });
     return unblockedUser;
   }
-  
  }
 
 
- export default  new UserService();
+ export default UserService;

@@ -2,8 +2,11 @@
 import  type { Response } from 'express';
 import type { AuthRequest } from '../types';
 
-import  userService  from '../services/UserService';
+import  UserService  from '../services/UserService';
+import { prismaUserRepository } from '../repositories/prisma-repository';
 
+
+const userService = new UserService(prismaUserRepository);
 
 
 export async function getUserById(req: AuthRequest, res: Response) {
