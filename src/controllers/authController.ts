@@ -11,11 +11,13 @@ const userService = new UserService(prismaUserRepository);
 export async function register(req: Request, res: Response) {
   try {
     const user = await userService.createUser(req.body);
-    res.status(201).json({ message: 'User registered', userId: user.id });
+    const token = generateToken(user.id, user.role);
+    res.status(201).json({ message: 'User registered', userId: user.id, token });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
 }
+
 
 
 export async function login(req: Request, res: Response) {
