@@ -1,90 +1,72 @@
 import { prisma } from '../prismaClient';
 import argon2 from 'argon2';
 
-import type { CreateUserData, UserRepository} from '../types';
+import type { CreateUserData, UserRepository } from '../types';
 
 
 class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: UserRepository) { }
 
   async createUser(data: CreateUserData) {
 
-    const userExist = await prisma.user.findUnique({
-      where: {
-        email: data.email
-      }
-    })
+    const userExist = await this.userRepository.findByEmail(data.email);
     if (userExist) {
       throw new Error('Mail already exists');
     }
 
     const hashed = await argon2.hash(data.password);
     const birthDateObj = new Date(data.birthDate);
-    const newUser = await prisma.user.create({
-      data: {
-        fullName: data.fullName,
-        birthDate: birthDateObj,
-        email: data.email,
-        password: hashed,
-         // Для демонстрации роли берём из клиента, но обычно здесь всегда 'USER'
-        role: data.role || 'USER',
-        isActive: true,
-      },
-    });
-    
+
+    const userData = {
+      fullName: data.fullName,
+      birthDate: birthDateObj,
+      email: data.email,
+      password: hashed,
+      // Для демонстрации роли берём из клиента, но обычно здесь всегда 'USER'
+      role: data.role || 'USER',
+      isActive: true,
+    }
+
+    const newUser = await this.userRepository.create(userData);
+
     return newUser;
   }
 
   async authenticateUser(email: string, password: string) {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email
-      }
-    })
+    const user =  await this.userRepository.findByEmail(email);
     if (!user) {
       throw new Error('User with such email does not exist');
     }
     const passwordIsValid = await argon2.verify(user.password, password);
-    if(!passwordIsValid) {
-      throw new Error ('Password incorrect');
+    if (!passwordIsValid) {
+      throw new Error('Password incorrect');
     }
     return user;
   }
 
-  async getUserById(id:number) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-    });
+  async getUserById(id: number) {
+    const user = await this.userRepository.findById(id);
     return user;
   }
 
   async getAllUsers() {
-    const users = await prisma.user.findMany();
+    const users = await this.userRepository.findAll();
     return users;
   }
 
   async blockUser(id: number) {
-    const blockUser = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        isActive: false,
-      },
-    });
+
+    const blockUser = await this.userRepository.update(id, { isActive: false });
+
+
     return blockUser;
   }
 
   async unblockUser(id: number) {
-    const unblockedUser = await prisma.user.update({
-      where: { id },
-      data: { isActive: true },
-    });
+    const unblockedUser = await this.userRepository.update(id, { isActive: false })
     return unblockedUser;
   }
- }
+}
 
 
- export default UserService;
+export default UserService;
