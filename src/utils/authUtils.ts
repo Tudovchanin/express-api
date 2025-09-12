@@ -1,18 +1,47 @@
 import jwt from 'jsonwebtoken';
 
-
-const JWT_SECRET = process.env.JWT_SECRET!;
-
-
-
-export function generateToken(userId: number, role: string) {
-  return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '1h' });
+type GenerateTokenParams = {
+  userId: number;
+  role: string;
+  secret: string;
+  expiresIn?: jwt.SignOptions['expiresIn'];
 }
 
-export function verifyToken(token: string){
+type GenerateRefreshTokenParams = {
+  userId: number;
+  secret: string;
+  expiresIn?: jwt.SignOptions['expiresIn'];
+}
+
+export function generateAccessToken(params: GenerateTokenParams): string {
+  const {
+    userId,
+    role,
+    secret,
+    expiresIn = '30m'
+  } = params;
+
+  return jwt.sign({ userId, role }, secret, { expiresIn });
+}
+
+export function generateRefreshToken(params: GenerateRefreshTokenParams): string {
+  const {
+    userId,
+    secret,
+    expiresIn = '7d'
+  } = params;
+
+  return jwt.sign({ userId }, secret, { expiresIn });
+}
+
+export function verifyToken(token: string, secret:string){
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, secret);
   } catch {
     return null;
   }
+}
+
+export function getTokenExpiryDate(validityPeriodMs: number): Date {
+  return new Date(Date.now() + validityPeriodMs);
 }

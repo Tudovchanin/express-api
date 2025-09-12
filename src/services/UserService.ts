@@ -1,7 +1,8 @@
-import { prisma } from '../prismaClient';
+
 import argon2 from 'argon2';
 
 import type { CreateUserData, UserRepository } from '../types';
+
 
 
 class UserService {
@@ -22,8 +23,7 @@ class UserService {
       birthDate: birthDateObj,
       email: data.email,
       password: hashed,
-      // Для демонстрации роли берём из клиента, но обычно здесь всегда 'USER'
-      role: data.role || 'USER',
+      role:  'USER',
       isActive: true,
     }
 
@@ -65,6 +65,11 @@ class UserService {
   async unblockUser(id: number) {
     const unblockedUser = await this.userRepository.update(id, { isActive: false })
     return unblockedUser;
+  }
+
+  async deleteUser(id: number) {
+    const user = await this.userRepository.deleteUserById(id);
+    return user;
   }
 }
 

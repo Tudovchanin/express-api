@@ -1,10 +1,15 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import { prisma } from './prismaClient';
+import cookieParser from 'cookie-parser';
+
 import router from './routes/index';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
+const SECRET_COOKIE = process.env.COOKIE_SECRET;
+
+app.use(cookieParser(SECRET_COOKIE));
 app.use(express.json()) 
 app.use('/api', router);
 
