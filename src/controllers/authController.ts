@@ -28,8 +28,9 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     res.cookie('refreshToken', tokenRefresh, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: validityPeriodMs,
+      signed:true
     });
 
     res.status(201).json({ message: 'User registered', 'token Refresh ExpiresAt': expiresAt, tokenAccess, tokenRefresh });
@@ -42,6 +43,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
   }
 }
 export async function login(req: Request, res: Response, next: NextFunction) {
+  console.log(req.body, 'DATA LOGIN');
+  
   try {
     const user = await userService.authenticateUser(req.body.email, req.body.password);
 
@@ -53,13 +56,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const validityPeriodMs = 7 * 24 * 60 * 60 * 1000; 
     const expiresAt = getTokenExpiryDate(validityPeriodMs);
 
-    refreshTokenService.saveToken(user.id, tokenRefresh, expiresAt);
     res.cookie('refreshToken', tokenRefresh, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: validityPeriodMs,
+      signed:true
     });
 
-
-    res.json({ message: 'User sign in', 'token Refresh ExpiresAt': expiresAt, tokenAccess, tokenRefresh });
+    res.json({ message: 'User sign in', tokenRefreshExpiresAt: expiresAt, tokenAccess, tokenRefresh });
 
   } catch (err: any) {
     if (err.message === 'User with such email does not exist') {
@@ -75,19 +80,25 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function refreshAccessToken(req: Request, res: Response, next: NextFunction) {
   try {
+
     const refreshToken = req.cookies.refreshToken;
+
     if (!refreshToken) {
       return res.status(401).json({ message: "Refresh token not found" });
     }
+
     const payload = verifyToken(refreshToken, JWT_REFRESH_SECRET);
+
     if (!payload || typeof payload === 'string') {
       return res.status(401).json({ message: "Invalid or expired refresh token" });
     }
 
     const user = await userService.getUserById(payload.userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
     const newAccessToken = generateAccessToken({ userId: user.id, role: user.role, secret: JWT_ACCESS_SECRET });
     
     res.json({userName:user.fullName, userEmail:user.email, newAccessToken: newAccessToken});

@@ -15,8 +15,21 @@ export const prismaUserRepository: UserRepository = {
   },
 
   async findAll() {
-    return prisma.user.findMany();
+    return prisma.user.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        birthDate: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        // password not return !!!
+      },
+    });
   },
+  
 
   async create(userData: CreateUserData) {
     return prisma.user.create({ data: userData });

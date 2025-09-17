@@ -39,7 +39,8 @@ export async function getMe(req: AuthRequest, res: Response, next: NextFunction)
       (err as any).status = 404;
       throw err;
     }
-    res.json(user);
+    const { password, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
 
   } catch (err) {
     next(err);
@@ -60,7 +61,9 @@ export async function getUserById(req: AuthRequest, res: Response, next: NextFun
       (err as any).status = 404;
       throw err;
     }
-    res.json(user);
+
+    const { password, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
   } catch (err) {
     next(err);
   }
@@ -78,7 +81,7 @@ export async function blockMe(req: AuthRequest, res: Response, next: NextFunctio
       throw err;
     }
     await userService.blockUser(id);
-    res.json({ message: 'User blocked' });
+    res.json({ message: `Me blocked` });
 
   } catch (err) {
     next(err);
@@ -96,7 +99,7 @@ export async function blockUser(req: AuthRequest, res: Response, next: NextFunct
       throw err;
     }
     await userService.blockUser(id);
-    res.json({ message: 'User blocked' });
+    res.json({ message: `User ${id} blocked` });
 
   } catch (err) {
     next(err);
@@ -114,7 +117,7 @@ export async function unblockMe(req: AuthRequest, res: Response, next: NextFunct
       throw err;
     }
     await userService.unblockUser(id);
-    res.json({ message: 'User unblocked' });
+    res.json({ message: 'Me unblocked' });
 
   } catch (err) {
     next(err)
@@ -129,7 +132,7 @@ export async function unblockUser(req: AuthRequest, res: Response, next: NextFun
       throw err;
     }
     await userService.unblockUser(id);
-    res.json({ message: 'User unblocked' });
+    res.json({ message: `User ${id} unblocked` });
 
   } catch (err) {
     next(err);
@@ -149,7 +152,7 @@ export async function deleteMe(req: AuthRequest, res: Response, next: NextFuncti
     }
 
     await userService.deleteUser(id);
-    res.json({ message: `user ${id} delete` });
+    res.json({ message: `Me delete` });
   } catch (err) {
     next(err);
   }
@@ -166,7 +169,7 @@ export async function deleteUser(req: AuthRequest, res: Response, next: NextFunc
     }
 
     await userService.deleteUser(id);
-    res.json({ message: `user ${id} delete` });
+    res.json({ message: `User ${id} delete` });
   } catch (err) {
     next(err);
   }

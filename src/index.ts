@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 import { prisma } from './prismaClient';
 import cookieParser from 'cookie-parser';
 
@@ -9,8 +10,28 @@ const PORT = process.env.PORT || 3000;
 
 const SECRET_COOKIE = process.env.COOKIE_SECRET;
 
+// 'http://127.0.0.1:5500' - Local live server domain for testing index.html with CORS
+
+const allowedOrigins: string[]= ['http://example.com', 'https://sub.example.com', 'http://127.0.0.1:5500'];
+
+
+
+app.use(cors({
+  origin: (origin: string | undefined, callback:(err: Error | null, allow?: boolean) => void) => {
+    if (!origin) return callback(null, true);  // разрешаем запросы без origin (Postman, same-origin)
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}))
+
 app.use(cookieParser(SECRET_COOKIE));
-app.use(express.json()) 
+app.use(express.json({ limit: '50kb' }));
 app.use('/api', router);
 
 

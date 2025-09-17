@@ -13,12 +13,11 @@ export type User = {
   fullName: string;
   birthDate: Date;
   email: string;
-  password: string;
+  password?:string;
   role: UserRole;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  refreshTokens?: RefreshToken[];
 };
 export type CreateUserData = {
   fullName: string;

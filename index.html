@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 5px 10px;
+      background-color: black;
+      color: aliceblue;
+    }
+
+    form {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body style="display: grid; align-content: start; gap: 20px; min-height: 100vh; padding: 20px;">
+  <div
+    style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(163, 255, 127);">
+    <h1 style="min-width: 150px;">Sign Up</h1>
+    <form id="registerForm">
+      <div>
+        <label for="loginEmail">Email:</label>
+        <input type="email" id="registerEmail" name="email" value="...@gmail.com" required />
+      </div>
+
+      <div> <label for="loginPassword">Password:</label>
+        <input type="password" id="registerPassword" name="password" value="12345678" required />
+      </div>
+      <div>
+        <label for="fullName">Full Name:</label>
+        <input type="text" id="fullName" name="fullName" value="" required />
+      </div>
+      <div>
+        <label for="birthDate">Birth Date:</label>
+        <input type="date" id="birthDate" name="birthDate" value="" required />
+      </div>
+
+
+
+
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+
+  <div
+    style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: aquamarine;">
+    <h1 style="min-width: 150px;">Sign In</h1>
+    <form id="loginForm">
+      <div> <label for="loginEmail">Email:</label>
+        <input type="email" id="loginEmail" name="email" value="admin@gmail.com" required />
+      </div>
+      <div><label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" name="password" value="12345678" required />
+      </div>
+
+
+      <button type="submit">Sign In</button>
+    </form>
+  </div>
+
+
+  <div
+    style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(127, 140, 255);">
+    <h1 style="min-width: 150px;">Get users</h1>
+    <form id="getUsers">
+      <div>
+        <label for="tokenAccess">Access Token</label>
+        <input id="tokenAccess" type="text" name="accessToken">
+      </div>
+      <button type="submit">Get users</button>
+      
+    </form>
+  </div>
+
+  
+  <div>
+    <h1>API RESPONSE</h1>
+    <div>
+      <h2 style="line-height: 1.5;">Token Access(TEST API /api/auth/login):</h2>
+    <div class="message" id="loginMessage" style="display: inline-block;">NOT ACCESS TOKEN</div>
+    </div>
+    <div>
+      <h2 style="line-height: 1.5;">Register Data(TEST API /api/auth/register):</h2>
+    <div class="message" id="registerMessage" style="display: inline-block;">NOT DATA</div>
+
+    <div>
+      <h2 style="line-height: 1.5;">All users(TEST API /api/users):</h2>
+    <pre class="message" id="allUsersMessage" style="display: inline-block;">NOT DATA</pre>
+    
+
+  </div>
+  <script>
+
+    async function postData(url = '', data = {}) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    }
+
+    
+    async function getAllUsers(url = '',token) {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          
+        },
+        credentials: 'include',
+      });
+      return response.json();
+    }
+
+
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const data = {
+        email: this.email.value,
+        password: this.password.value,
+      };
+      try {
+        const result = await postData('http://localhost:3000/api/auth/login', data);
+
+
+        console.log(result);
+
+        document.getElementById('loginMessage').textContent = result.tokenAccess || 'sign in'
+      } catch (err) {
+        document.getElementById('loginMessage').textContent = 'Login error';
+      }
+    });
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const data = {
+        email: this.email.value,
+        password: this.password.value,
+        fullName: this.fullName.value,
+        birthDate: this.birthDate.value,
+      };
+      try {
+        const result = await postData('http://localhost:3000/api/auth/register', data);
+
+
+        console.log(result);
+
+        document.getElementById('registerMessage').textContent = JSON.stringify(result) || 'sign up'
+      } catch (err) {
+        document.getElementById('registerMessage').textContent = 'Sign Up error';
+      }
+    });
+
+    document.getElementById('getUsers').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+      console.log(accessToken);
+     
+      try {
+        const result = await getAllUsers('http://localhost:3000/api/users', accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('allUsersMessage').textContent =JSON.stringify(result, null, '\t') || 'not users'
+      } catch (err) {
+        document.getElementById('allUsersMessage').textContent = 'Get users error';
+      }
+    });
+
+  </script>
+</body>
+
+</html>

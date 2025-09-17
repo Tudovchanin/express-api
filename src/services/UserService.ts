@@ -37,7 +37,7 @@ class UserService {
     if (!user) {
       throw new Error('User with such email does not exist');
     }
-    const passwordIsValid = await argon2.verify(user.password, password);
+    const passwordIsValid = await argon2.verify(user.password!, password);
     if (!passwordIsValid) {
       throw new Error('Password incorrect');
     }
