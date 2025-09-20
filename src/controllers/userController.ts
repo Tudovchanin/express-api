@@ -27,13 +27,13 @@ export async function getUsers(req: AuthRequest, res: Response, next: NextFuncti
 
 export async function getMe(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const id = req.user?.userId;
-    if (!id) {
+    const idUserAuth = req.user?.userId;
+    if (!idUserAuth) {
       const err = new Error('Unauthorized');
       (err as any).status = 401;
       throw err;
     }
-    const user = await userService.getUserById(id);
+    const user = await userService.getUserById(idUserAuth);
     if (!user) {
       const err = new Error('User not found');
       (err as any).status = 404;
@@ -49,13 +49,13 @@ export async function getMe(req: AuthRequest, res: Response, next: NextFunction)
 }
 export async function getUserById(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const id = Number(req.params.id);
-    if (req.user?.userId !== id && req.user?.role !== 'ADMIN') {
+    const idParams = Number(req.params.id);
+    if (req.user?.userId !== idParams && req.user?.role !== 'ADMIN') {
       const err = new Error('Forbidden');
       (err as any).status = 403;
       throw err;
     }
-    const user = await userService.getUserById(id);
+    const user = await userService.getUserById(idParams);
     if (!user) {
       const err = new Error('User not found');
       (err as any).status = 404;
@@ -92,14 +92,14 @@ export async function blockUser(req: AuthRequest, res: Response, next: NextFunct
 
   try {
 
-    const id = Number(req.params.id);
-    if (req.user?.userId !== id && req.user?.role !== 'ADMIN') {
+    const idParams = Number(req.params.id);
+    if (req.user?.userId !== idParams && req.user?.role !== 'ADMIN') {
       const err = new Error('Forbidden');
       (err as any).status = 403;
       throw err;
     }
-    await userService.blockUser(id);
-    res.json({ message: `User ${id} blocked` });
+    await userService.blockUser(idParams);
+    res.json({ message: `User ${idParams} blocked` });
 
   } catch (err) {
     next(err);
@@ -107,32 +107,17 @@ export async function blockUser(req: AuthRequest, res: Response, next: NextFunct
 
 }
 
-
-export async function unblockMe(req: AuthRequest, res: Response, next: NextFunction) {
-  try {
-    const id = req.user?.userId;
-    if (!id) {
-      const err = new Error('Unauthorized');
-      (err as any).status = 401;
-      throw err;
-    }
-    await userService.unblockUser(id);
-    res.json({ message: 'Me unblocked' });
-
-  } catch (err) {
-    next(err)
-  }
-}
 export async function unblockUser(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const id = Number(req.params.id);
-    if (req.user?.userId !== id && req.user?.role !== 'ADMIN') {
+    const idParams = Number(req.params.id);
+  
+    if (req.user?.userId !== idParams && req.user?.role !== 'ADMIN') {
       const err = new Error('Forbidden');
       (err as any).status = 403;
       throw err;
     }
-    await userService.unblockUser(id);
-    res.json({ message: `User ${id} unblocked` });
+    await userService.unblockUser(idParams);
+    res.json({ message: `User ${idParams} unblocked` });
 
   } catch (err) {
     next(err);
@@ -144,14 +129,14 @@ export async function unblockUser(req: AuthRequest, res: Response, next: NextFun
 export async function deleteMe(req: AuthRequest, res: Response, next: NextFunction) {
 
   try {
-    const id = req.user?.userId;
-    if (!id) {
+    const idUserAuth = req.user?.userId;
+    if (!idUserAuth) {
       const err = new Error('Unauthorized, not delete user');
       (err as any).status = 401;
       throw err;
     }
 
-    await userService.deleteUser(id);
+    await userService.deleteUser(idUserAuth);
     res.json({ message: `Me delete` });
   } catch (err) {
     next(err);
@@ -161,15 +146,15 @@ export async function deleteMe(req: AuthRequest, res: Response, next: NextFuncti
 export async function deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
 
   try {
-    const id = Number(req.params.id);
-    if (req.user?.userId !== id && req.user?.role !== 'ADMIN') {
+    const idParams = Number(req.params.id);
+    if (req.user?.userId !== idParams && req.user?.role !== 'ADMIN') {
       const err = new Error('Forbidden');
       (err as any).status = 403;
       throw err;
     }
 
-    await userService.deleteUser(id);
-    res.json({ message: `User ${id} delete` });
+    await userService.deleteUser(idParams);
+    res.json({ message: `User ${idParams} delete` });
   } catch (err) {
     next(err);
   }

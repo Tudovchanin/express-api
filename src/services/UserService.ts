@@ -44,6 +44,11 @@ class UserService {
     return user;
   }
 
+  async userIsActive(id:number) {
+    return this.userRepository.findActiveById(id);
+  }
+
+
   async getUserById(id: number) {
     const user = await this.userRepository.findById(id);
     return user;
@@ -63,7 +68,7 @@ class UserService {
   }
 
   async unblockUser(id: number) {
-    const unblockedUser = await this.userRepository.update(id, { isActive: false })
+    const unblockedUser = await this.userRepository.update(id, { isActive: true })
     return unblockedUser;
   }
 

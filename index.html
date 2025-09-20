@@ -28,80 +28,265 @@
   </style>
 </head>
 
-<body style="display: grid; align-content: start; gap: 20px; min-height: 100vh; padding: 20px;">
-  <div
-    style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(163, 255, 127);">
-    <h1 style="min-width: 150px;">Sign Up</h1>
-    <form id="registerForm">
-      <div>
-        <label for="loginEmail">Email:</label>
-        <input type="email" id="registerEmail" name="email" value="...@gmail.com" required />
-      </div>
+<body
+  style="display: grid; align-content: start; gap: 20px; width: calc(100vw - 20px); min-height: 100vh; padding: 20px 0 20px 20px; background-color: rgb(56, 55, 53);">
 
-      <div> <label for="loginPassword">Password:</label>
-        <input type="password" id="registerPassword" name="password" value="12345678" required />
-      </div>
-      <div>
-        <label for="fullName">Full Name:</label>
-        <input type="text" id="fullName" name="fullName" value="" required />
-      </div>
-      <div>
-        <label for="birthDate">Birth Date:</label>
-        <input type="date" id="birthDate" name="birthDate" value="" required />
-      </div>
+  <button style="font-size: 20px;" onclick="location.reload()">🗑️ Очистить всё</button>
 
-
-
-
-      <button type="submit">Sign Up</button>
-    </form>
-  </div>
-
-  <div
-    style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: aquamarine;">
-    <h1 style="min-width: 150px;">Sign In</h1>
-    <form id="loginForm">
-      <div> <label for="loginEmail">Email:</label>
-        <input type="email" id="loginEmail" name="email" value="admin@gmail.com" required />
-      </div>
-      <div><label for="loginPassword">Password:</label>
-        <input type="password" id="loginPassword" name="password" value="12345678" required />
-      </div>
-
-
-      <button type="submit">Sign In</button>
-    </form>
-  </div>
-
-
-  <div
-    style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(127, 140, 255);">
-    <h1 style="min-width: 150px;">Get users</h1>
-    <form id="getUsers">
-      <div>
-        <label for="tokenAccess">Access Token</label>
-        <input id="tokenAccess" type="text" name="accessToken">
-      </div>
-      <button type="submit">Get users</button>
-      
-    </form>
-  </div>
-
-  
   <div>
-    <h1>API RESPONSE</h1>
-    <div>
-      <h2 style="line-height: 1.5;">Token Access(TEST API /api/auth/login):</h2>
-    <div class="message" id="loginMessage" style="display: inline-block;">NOT ACCESS TOKEN</div>
-    </div>
-    <div>
-      <h2 style="line-height: 1.5;">Register Data(TEST API /api/auth/register):</h2>
-    <div class="message" id="registerMessage" style="display: inline-block;">NOT DATA</div>
+    <!-- api -->
+    <div style="flex-shrink: 1;">
+      <!-- Auth -->
 
-    <div>
-      <h2 style="line-height: 1.5;">All users(TEST API /api/users):</h2>
-    <pre class="message" id="allUsersMessage" style="display: inline-block;">NOT DATA</pre>
-    
+
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(163, 255, 127);">
+        <h1 style="min-width: 150px;">Sign Up</h1>
+        <form id="registerForm">
+          <div>
+            <label for="loginEmail">Email:</label>
+            <input type="email" id="registerEmail" name="email" value="...@gmail.com" required />
+          </div>
+
+          <div> <label for="loginPassword">Password:</label>
+            <input type="password" id="registerPassword" name="password" value="12345678" required />
+          </div>
+          <div>
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" name="fullName" value="" required />
+          </div>
+          <div>
+            <label for="birthDate">Birth Date:</label>
+            <input type="date" id="birthDate" name="birthDate" value="" required />
+          </div>
+          <button type="submit">Sign Up</button>
+        </form>
+      </div>
+
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: aquamarine;">
+        <h1 style="min-width: 150px;">Sign In</h1>
+        <form id="loginForm">
+          <div> <label for="loginEmail">Email:</label>
+            <input type="email" id="loginEmail" name="email" value="admin@gmail.com" required />
+          </div>
+          <div><label for="loginPassword">Password:</label>
+            <input type="password" id="loginPassword" name="password" value="12345678" required />
+          </div>
+
+
+          <button type="submit">Sign In</button>
+        </form>
+      </div>
+
+
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(202, 39, 202);">
+        <h1 style="min-width: 150px;">Logout</h1>
+        <form id="logout">
+          <div>
+            <label for="tokenAccess-0">Access Token</label>
+            <input id="tokenAccess-0" type="text" name="accessToken">
+          </div>
+          <button type="submit">Logout</button>
+        </form>
+      </div>
+
+      <!-- Users -->
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(127, 140, 255);">
+        <h1 style="min-width: 150px;">Get Users</h1>
+        <form id="getUsers">
+          <div>
+            <label for="tokenAccess-1">Access Token</label>
+            <input id="tokenAccess-1" type="text" name="accessToken">
+          </div>
+          <button type="submit">Get Users</button>
+
+        </form>
+      </div>
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(131, 138, 202);">
+        <h1 style="min-width: 150px;">Get one User by ID</h1>
+        <form id="getOneUserByID">
+          <div>
+            <label for="tokenAccess-2">Access Token</label>
+            <input id="tokenAccess-2" type="text" name="accessToken">
+          </div>
+          <div>
+            <label for="userId-1">User ID</label>
+            <input id="userId-1" type="text" name="idUser">
+          </div>
+
+          <button type="submit">Get User</button>
+
+        </form>
+      </div>
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(180, 185, 228);">
+        <h1 style="min-width: 150px;">Get Me</h1>
+        <form id="getMe">
+          <div>
+            <label for="tokenAccess-3">Access Token</label>
+            <input id="tokenAccess-3" type="text" name="accessToken">
+          </div>
+          <button type="submit">Get Me</button>
+        </form>
+      </div>
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(228, 180, 192);">
+        <h1 style="min-width: 150px;">Block User By ID</h1>
+        <form id="block">
+          <div>
+            <label for="tokenAccess-4">Access Token</label>
+            <input id="tokenAccess-4" type="text" name="accessToken">
+          </div>
+          <div>
+            <label for="userId-2">User ID</label>
+            <input id="userId-2" type="text" name="idUser">
+          </div>
+
+          <button type="submit">Block User</button>
+
+        </form>
+      </div>
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(180, 228, 204);">
+        <h1 style="min-width: 150px;">Unblock User By ID</h1>
+        <form id="unblock">
+          <div>
+            <label for="tokenAccess-5">Access Token</label>
+            <input id="tokenAccess-5" type="text" name="accessToken">
+          </div>
+          <div>
+            <label for="userId-3">User ID</label>
+            <input id="userId-3" type="text" name="idUser">
+          </div>
+
+          <button type="submit">Unblock User</button>
+
+        </form>
+      </div>
+
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(211, 92, 45);">
+        <h1 style="min-width: 150px;">Block Me</h1>
+        <form id="blockMe">
+          <div>
+            <label for="tokenAccess-6">Access Token</label>
+            <input id="tokenAccess-6" type="text" name="accessToken">
+          </div>
+
+          <button type="submit">Block Me</button>
+
+        </form>
+      </div>
+
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(236, 37, 37);">
+        <h1 style="min-width: 150px;">Delete User By ID</h1>
+        <form id="deleteUser">
+          <div>
+            <label for="tokenAccess-7">Access Token</label>
+            <input id="tokenAccess-7" type="text" name="accessToken">
+          </div>
+          <div>
+            <label for="userId-4">User ID</label>
+            <input id="userId-4" type="text" name="idUser">
+          </div>
+
+          <button type="submit">DELETE User</button>
+
+        </form>
+      </div>
+
+
+      <div
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 30px; padding: 10px;  background-color: rgb(255, 0, 0);">
+        <h1 style="min-width: 150px;">Delete Me</h1>
+        <form id="deleteMe">
+          <div>
+            <label for="tokenAccess-8">Access Token</label>
+            <input id="tokenAccess-8" type="text" name="accessToken">
+          </div>
+
+
+          <button style="color: red;" type="submit">DELETE ME</button>
+
+        </form>
+      </div>
+
+
+
+    </div>
+
+    <!-- Response -->
+    <div style="background-color: rgb(15, 15, 15); color: rgb(228, 221, 213);padding: 20px;">
+      <h1>API RESPONSE</h1>
+
+      <div>
+        <h2 style="line-height: 1.5;"> Logout (TEST API /api/auth/logout):</h2>
+        <div class="message" id="logoutMessage" style="display: inline-block;  word-break: break-all;">NO DATA</div>
+      </div>
+
+      <div>
+        <h2 style="line-height: 1.5;">Token Access(TEST API /api/auth/login):</h2>
+        <div class="message" id="loginMessage" style="display: inline-block;  word-break: break-all;">NO ACCESS TOKEN
+        </div>
+      </div>
+
+
+      <div>
+        <h2 style="line-height: 1.5;">Register Data(TEST API /api/auth/register):</h2>
+        <div class="message" id="registerMessage" style="display: inline-block;">NO DATA</div>
+
+      </div>
+
+      <div>
+        <h2 style="line-height: 1.5;"> Get all Users(TEST API /api/users):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="allUsersMessage"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+
+      <div>
+        <h2 style="line-height: 1.5;">Get User by ID(TEST API /api/users/id):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="OneUsersByIDMessage"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+
+
+      <div>
+        <h2 style="line-height: 1.5;">Get Me (TEST API /api/users/me):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="MeMessage"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+
+
+
+      <div>
+        <h2 style="line-height: 1.5;">Block/Unblock (TEST API /api/users/block/id, /api/users/unblock/id):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="blockUnblock"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+
+      <div>
+        <h2 style="line-height: 1.5;">Block Me (TEST API /api/users/block/me):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="meBlock"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+
+      <div>
+        <h2 style="line-height: 1.5;">Delete User (TEST API /api/users/delete/id):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="deleteUserMessage"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+      <div>
+        <h2 style="line-height: 1.5;">Delete Me (TEST API /api/users/delete/me):</h2>
+        <pre style="font-size: 16px; font-family: inherit;" class="message" id="deleteMeMessage"
+          style="display: inline-block;">NO DATA</pre>
+      </div>
+
+    </div>
 
   </div>
   <script>
@@ -118,19 +303,79 @@
       return response.json();
     }
 
-    
-    async function getAllUsers(url = '',token) {
+    async function getData(url = '', token) {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
-          
+
         },
         credentials: 'include',
       });
       return response.json();
     }
+
+    async function patchData(url = '', token) {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+
+        },
+        credentials: 'include',
+      });
+      return response.json();
+    }
+
+    async function deleteData(url = '', token) {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+
+        },
+        credentials: 'include',
+      });
+      return response.json();
+    }
+
+    async function logout(url = '', token) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+
+        },
+        credentials: 'include',
+      });
+      return response.json();
+    }
+
+
+    document.getElementById('logout').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+
+      const accessToken = this.accessToken.value;
+
+     
+      const url = `http://localhost:3000/api/auth/logout`
+
+      try {
+        const result = await logout(url, accessToken);
+
+
+        console.log(result, 'result');
+
+        document.getElementById('logoutMessage').textContent = result.tokenAccess || 'user not logout'
+      } catch (err) {
+        document.getElementById('logoutMessage').textContent = 'logout error';
+      }
+    });
 
 
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
@@ -145,7 +390,7 @@
 
         console.log(result);
 
-        document.getElementById('loginMessage').textContent = result.tokenAccess || 'sign in'
+        document.getElementById('loginMessage').textContent = result.tokenAccess || 'user not found'
       } catch (err) {
         document.getElementById('loginMessage').textContent = 'Login error';
       }
@@ -176,18 +421,211 @@
       const accessToken = this.accessToken.value;
 
       console.log(accessToken);
-     
+
       try {
-        const result = await getAllUsers('http://localhost:3000/api/users', accessToken);
+        const result = await getData('http://localhost:3000/api/users', accessToken);
 
 
         console.log(result);
 
-        document.getElementById('allUsersMessage').textContent =JSON.stringify(result, null, '\t') || 'not users'
+        document.getElementById('allUsersMessage').textContent = JSON.stringify(result, null, '\t') || 'no users'
       } catch (err) {
         document.getElementById('allUsersMessage').textContent = 'Get users error';
       }
     });
+
+
+    document.getElementById('getOneUserByID').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+      const id = this.idUser.value;
+
+
+      console.log(accessToken);
+      console.log(id);
+
+      const url = `http://localhost:3000/api/users/${id}`
+
+      try {
+        const result = await getData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('OneUsersByIDMessage').textContent = JSON.stringify(result, null, '\t') || 'no user'
+      } catch (err) {
+        document.getElementById('OneUsersByIDMessage').textContent = 'Get one user bi ID error';
+      }
+    });
+
+
+
+
+    document.getElementById('getMe').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+
+      console.log(accessToken);
+
+      const url = `http://localhost:3000/api/users/me`
+
+      try {
+        const result = await getData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('MeMessage').textContent = JSON.stringify(result, null, '\t') || 'no me'
+      } catch (err) {
+        document.getElementById('MeMessage').textContent = 'Get me error';
+      }
+    });
+
+
+
+
+    document.getElementById('block').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+      const id = this.idUser.value;
+
+
+      console.log(accessToken);
+      console.log(id);
+
+      const url = `http://localhost:3000/api/users/block/${id}`
+
+
+
+      try {
+        const result = await patchData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('blockUnblock').textContent = JSON.stringify(result, null, '\t') || 'no block'
+      } catch (err) {
+        document.getElementById('blockUnblock').textContent = 'blockUnblock error';
+      }
+    });
+
+
+
+    document.getElementById('unblock').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+      const id = this.idUser.value;
+
+
+      console.log(accessToken);
+      console.log(id);
+
+      const url = `http://localhost:3000/api/users/unblock/${id}`
+
+
+
+      try {
+        const result = await patchData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('blockUnblock').textContent = JSON.stringify(result, null, '\t') || 'no unblock'
+      } catch (err) {
+        document.getElementById('blockUnblock').textContent = 'blockUnblock error';
+      }
+    });
+
+
+
+    document.getElementById('blockMe').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+
+
+      console.log(accessToken);
+
+      const url = `http://localhost:3000/api/users/block/me`
+
+
+
+      try {
+        const result = await patchData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('meBlock').textContent = JSON.stringify(result, null, '\t') || 'no block user'
+      } catch (err) {
+        document.getElementById('meBlock').textContent = 'block me error';
+      }
+    });
+
+
+
+    document.getElementById('deleteUser').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+      const id = this.idUser.value;
+
+
+      console.log(accessToken);
+      console.log(id);
+
+      const url = `http://localhost:3000/api/users/delete/${id}`
+
+
+
+      try {
+        const result = await deleteData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('deleteUserMessage').textContent = JSON.stringify(result, null, '\t') || 'no delete'
+      } catch (err) {
+        document.getElementById('deleteUserMessage').textContent = 'delete user error';
+      }
+    });
+
+
+    document.getElementById('deleteMe').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const accessToken = this.accessToken.value;
+
+
+
+      console.log(accessToken);
+
+      const url = `http://localhost:3000/api/users/delete/me`
+
+
+
+      try {
+        const result = await deleteData(url, accessToken);
+
+
+        console.log(result);
+
+        document.getElementById('deleteMeMessage').textContent = JSON.stringify(result, null, '\t') || 'no delete me'
+      } catch (err) {
+        document.getElementById('deleteMeMessage').textContent = 'delete me error';
+      }
+    });
+
+
 
   </script>
 </body>

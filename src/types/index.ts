@@ -13,7 +13,7 @@ export type User = {
   fullName: string;
   birthDate: Date;
   email: string;
-  password?:string;
+  password?: string;
   role: UserRole;
   isActive: boolean;
   createdAt: Date;
@@ -27,12 +27,16 @@ export type CreateUserData = {
   role?: UserRole;
 }
 export type UserRepository = {
-  findByEmail(email: string): Promise<User | null>;
-  findById(id: number): Promise<User | null>;
   findAll(): Promise<User[]>;
+  findById(id: number): Promise<User | null>;
+  findActiveById(id: number): Promise<{ isActive: boolean } | null>;
+  findByEmail(email: string): Promise<User | null>;
+
   create(userData: any): Promise<User>;
+
   update(id: number, data: Partial<User>): Promise<User>;
-  deleteUserById(id: number) : Promise<User>
+
+  deleteUserById(id: number): Promise<User>
 };
 
 
@@ -51,10 +55,10 @@ export type RefreshTokenRepository = {
 
   saveToken(userId: number, token: string, expiresAt: Date): Promise<RefreshToken>;
 
-  deleteToken(userId:number): Promise<RefreshToken>
+  deleteToken(userId: number): Promise<RefreshToken>
 
-  revokeByUserId(userId:number): Promise<RefreshToken>
+  revokeByUserId(userId: number): Promise<RefreshToken>
 
-  restoreByUserId (userId:number): Promise<RefreshToken>
+  restoreByUserId(userId: number): Promise<RefreshToken>
 }
 

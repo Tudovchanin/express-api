@@ -11,6 +11,13 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 const userService = new UserService(prismaUserRepository);
 const refreshTokenService = new RefreshTokenService(prismaRefreshTokenRepository);
 
+function clearRefreshTokenCookie(res: Response) {
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  });
+}
 
 export async function register(req: Request, res: Response, next: NextFunction) {
   try {
@@ -27,13 +34,13 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
     res.cookie('refreshToken', tokenRefresh, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: validityPeriodMs,
       signed:true
     });
 
-    res.status(201).json({ message: 'User registered', 'token Refresh ExpiresAt': expiresAt, tokenAccess, tokenRefresh });
+    res.status(201).json({ message: 'User registered', 'token Refresh ExpiresAt': expiresAt, tokenAccess });
 
   } catch (err: any) {
     if (err.message === 'Mail already exists') {
@@ -56,15 +63,19 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const validityPeriodMs = 7 * 24 * 60 * 60 * 1000; 
     const expiresAt = getTokenExpiryDate(validityPeriodMs);
 
+    refreshTokenService.saveToken(user.id, tokenRefresh, expiresAt);
+
+
     res.cookie('refreshToken', tokenRefresh, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: validityPeriodMs,
       signed:true
     });
 
-    res.json({ message: 'User sign in', tokenRefreshExpiresAt: expiresAt, tokenAccess, tokenRefresh });
+
+    res.json({ message: 'User sign in', tokenRefreshExpiresAt: expiresAt, tokenAccess, tokenRefreshInDB: tokenRefresh, tokenRefreshInCookie: tokenRefresh });
 
   } catch (err: any) {
     if (err.message === 'User with such email does not exist') {
@@ -79,9 +90,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function refreshAccessToken(req: Request, res: Response, next: NextFunction) {
+
   try {
 
-    const refreshToken = req.cookies.refreshToken;
+    console.log('COOKIES', req.signedCookies.refreshToken);
+    
+
+    const refreshToken = req.signedCookies.refreshToken;
 
     if (!refreshToken) {
       return res.status(401).json({ message: "Refresh token not found" });
@@ -90,20 +105,68 @@ export async function refreshAccessToken(req: Request, res: Response, next: Next
     const payload = verifyToken(refreshToken, JWT_REFRESH_SECRET);
 
     if (!payload || typeof payload === 'string') {
+
+    // clear if refreshToken not valid
+    clearRefreshTokenCookie(res);
+
       return res.status(401).json({ message: "Invalid or expired refresh token" });
     }
 
+    // checking user in the db
     const user = await userService.getUserById(payload.userId);
 
     if (!user) {
+      clearRefreshTokenCookie(res);
       return res.status(404).json({ message: "User not found" });
+    }
+    // user deactivation check
+    if (!user.isActive) {
+      clearRefreshTokenCookie(res);
+      return res.status(401).json({ message: "Account deactivated" });
+    }
+
+    // checking the refreshToken in the db
+    const dbTokenRefresh = await refreshTokenService.getToken(payload.userId);
+    if (!dbTokenRefresh) {
+      clearRefreshTokenCookie(res);
+      return res.status(401).json({ message: "Refresh token not found in database" });
+    }
+
+    if (dbTokenRefresh.token !== refreshToken) {
+      // clearRefreshTokenCookie(res);
+      return res.status(401).json({ message: "Refresh token mismatch" , tokenRefreshCookie:refreshToken, dbTokenRefresh: dbTokenRefresh.token });
+    }
+
+    if (dbTokenRefresh.revoked) {
+      clearRefreshTokenCookie(res);
+      return res.status(401).json({ message: "Refresh token revoked" });
     }
 
     const newAccessToken = generateAccessToken({ userId: user.id, role: user.role, secret: JWT_ACCESS_SECRET });
     
-    res.json({userName:user.fullName, userEmail:user.email, newAccessToken: newAccessToken});
+    res.json({userName:user.fullName, userEmail:user.email, newAccessToken, refreshToken});
     
   } catch (err) {
     next(err);
   }
+}
+
+export async function logout(reg: Request, res: Response, next: NextFunction) {
+
+   try {
+
+    const refreshToken = reg.signedCookies.refreshToken;
+    clearRefreshTokenCookie(res);
+
+    if(refreshToken) {
+      const payload = verifyToken(refreshToken, JWT_REFRESH_SECRET);
+      if (payload && typeof payload !== 'string') {
+        await refreshTokenService.revokeToken(payload.userId);
+      }
+    }
+
+    res.json({ message: 'Logged out successfully' });
+   } catch (err) {
+    next(err);
+   }
 }

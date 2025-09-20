@@ -10,6 +10,14 @@ export const prismaUserRepository: UserRepository = {
     return prisma.user.findUnique({ where: { email } });
   },
 
+  async  findActiveById(id:number) {
+    const userIsActive =  await prisma.user.findUnique({
+      where: { id: id },
+      select: { isActive: true } // ← Получаем только поле isActive
+    });
+
+    return userIsActive
+  },
   async findById(id: number) {
     return prisma.user.findUnique({ where: { id } });
   },
@@ -81,7 +89,7 @@ export const prismaRefreshTokenRepository: RefreshTokenRepository = {
   async restoreByUserId(userId: number) {
     return prisma.refreshToken.update({
       where: { userId },
-      data: { revoked: true },
+      data: { revoked: false },
     });
   },
 };

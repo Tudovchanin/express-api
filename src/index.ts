@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { prisma } from './prismaClient';
@@ -8,11 +11,14 @@ import router from './routes/index';
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
+console.log(process.env.PORT, 'process.env.PORT');
+
+
 const SECRET_COOKIE = process.env.COOKIE_SECRET;
 
 // 'http://127.0.0.1:5500' - Local live server domain for testing index.html with CORS
 
-const allowedOrigins: string[]= ['http://example.com', 'https://sub.example.com', 'http://127.0.0.1:5500'];
+const allowedOrigins: string[]= ['http://127.0.0.1:5500'];
 
 
 
@@ -25,7 +31,7 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT','PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }))
