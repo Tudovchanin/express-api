@@ -16,6 +16,7 @@ export type User = {
   password?: string;
   role: UserRole;
   isActive: boolean;
+  emailConfirmed:boolean;
   createdAt: Date;
   updatedAt: Date;
 };

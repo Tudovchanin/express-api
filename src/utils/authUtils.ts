@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import type { Response } from 'express';
 
 type GenerateTokenParams = {
   userId: number;
@@ -44,4 +45,13 @@ export function verifyToken(token: string, secret:string){
 
 export function getTokenExpiryDate(validityPeriodMs: number): Date {
   return new Date(Date.now() + validityPeriodMs);
+}
+
+
+export function clearRefreshTokenCookie(res: Response) {
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  });
 }

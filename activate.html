@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activate Email</title>
+</head>
+<body>
+
+  <h1>Activate  Email</h1>
+
+
+  <div id="output"></div>
+  <script>
+
+const searchParams = new URLSearchParams(window.location.search);
+
+const output = document.getElementById('output');
+const emailToken = searchParams.get('token');
+
+async  function activateEmail (){
+
+  try {
+
+    const response = await fetch('http://localhost:3000/api/auth/activate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: emailToken })
+})
+  const result = await response.json();
+  console.log('result', result);
+    return result;
+    
+  } catch (error) {
+    console.log(error,'error');
+  }
+}
+
+async function showMessageActivate() {
+
+  const data = await activateEmail();
+  output.textContent = JSON.stringify(data);
+}
+
+showMessageActivate();
+
+  </script>
+  
+</body>
+</html>

@@ -3,7 +3,7 @@ import * as authController from '../controllers/authController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
-
+router.post('/activate', authController.activate);
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/refresh-token', authController.refreshAccessToken);

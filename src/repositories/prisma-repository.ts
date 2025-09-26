@@ -10,7 +10,7 @@ export const prismaUserRepository: UserRepository = {
     return prisma.user.findUnique({ where: { email } });
   },
 
-  async  findActiveById(id:number) {
+  async findActiveById(id:number) {
     const userIsActive =  await prisma.user.findUnique({
       where: { id: id },
       select: { isActive: true } // ← Получаем только поле isActive
@@ -33,6 +33,7 @@ export const prismaUserRepository: UserRepository = {
         isActive: true,
         createdAt: true,
         updatedAt: true,
+        emailConfirmed: true
         // password not return !!!
       },
     });

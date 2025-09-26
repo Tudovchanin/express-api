@@ -2,6 +2,7 @@
 import type { Response, NextFunction } from 'express';
 import type { AuthRequest } from '../types';
 
+import { clearRefreshTokenCookie } from '../utils/authUtils';
 import UserService from '../services/UserService';
 import { prismaUserRepository } from '../repositories/prisma-repository';
 
@@ -18,7 +19,7 @@ export async function getUsers(req: AuthRequest, res: Response, next: NextFuncti
       throw err;
     }
     const users = await userService.getAllUsers();
-    res.json(users);
+    res.status(200).json(users);
 
   } catch (err) {
     next(err);
@@ -39,8 +40,10 @@ export async function getMe(req: AuthRequest, res: Response, next: NextFunction)
       (err as any).status = 404;
       throw err;
     }
+
+    // using destructuring to eliminate password
     const { password, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
+    res.status(200).json(userWithoutPassword);
 
   } catch (err) {
     next(err);
@@ -63,7 +66,7 @@ export async function getUserById(req: AuthRequest, res: Response, next: NextFun
     }
 
     const { password, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
+    res.status(200).json(userWithoutPassword);
   } catch (err) {
     next(err);
   }
@@ -81,7 +84,8 @@ export async function blockMe(req: AuthRequest, res: Response, next: NextFunctio
       throw err;
     }
     await userService.blockUser(id);
-    res.json({ message: `Me blocked` });
+    clearRefreshTokenCookie(res);
+    res.status(200).json({ message: `Me blocked` });
 
   } catch (err) {
     next(err);
@@ -99,14 +103,13 @@ export async function blockUser(req: AuthRequest, res: Response, next: NextFunct
       throw err;
     }
     await userService.blockUser(idParams);
-    res.json({ message: `User ${idParams} blocked` });
+    res.status(200).json({ message: `User ${idParams} blocked` });
 
   } catch (err) {
     next(err);
   }
 
 }
-
 export async function unblockUser(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const idParams = Number(req.params.id);
@@ -117,7 +120,7 @@ export async function unblockUser(req: AuthRequest, res: Response, next: NextFun
       throw err;
     }
     await userService.unblockUser(idParams);
-    res.json({ message: `User ${idParams} unblocked` });
+    res.status(200).json({ message: `User ${idParams} unblocked` });
 
   } catch (err) {
     next(err);
@@ -137,7 +140,8 @@ export async function deleteMe(req: AuthRequest, res: Response, next: NextFuncti
     }
 
     await userService.deleteUser(idUserAuth);
-    res.json({ message: `Me delete` });
+    clearRefreshTokenCookie(res);
+    res.status(200).json({ message: `Me delete` });
   } catch (err) {
     next(err);
   }
@@ -154,7 +158,7 @@ export async function deleteUser(req: AuthRequest, res: Response, next: NextFunc
     }
 
     await userService.deleteUser(idParams);
-    res.json({ message: `User ${idParams} delete` });
+    res.status(200).json({ message: `User ${idParams} delete` });
   } catch (err) {
     next(err);
   }

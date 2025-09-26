@@ -18,7 +18,7 @@ const SECRET_COOKIE = process.env.COOKIE_SECRET;
 
 // 'http://127.0.0.1:5500' - Local live server domain for testing index.html with CORS
 
-const allowedOrigins: string[]= ['http://127.0.0.1:5500'];
+const allowedOrigins: string[]= [process.env.CLIENT_URL!];
 
 
 

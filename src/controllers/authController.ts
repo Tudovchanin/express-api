@@ -1,23 +1,19 @@
 import type { Request, Response, NextFunction } from 'express';
 
-import { generateAccessToken, generateRefreshToken, getTokenExpiryDate, verifyToken } from '../utils/authUtils';
+import { generateAccessToken, generateRefreshToken, getTokenExpiryDate, verifyToken, clearRefreshTokenCookie } from '../utils/authUtils';
 import { prismaUserRepository, prismaRefreshTokenRepository } from '../repositories/prisma-repository';
 
 import UserService from '../services/UserService';
 import RefreshTokenService from '../services/RefreshTokenService';
+import EmailService from '../services/EmailService';
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
-const userService = new UserService(prismaUserRepository);
+
+const emailService = new EmailService();
+const userService = new UserService(prismaUserRepository, emailService);
 const refreshTokenService = new RefreshTokenService(prismaRefreshTokenRepository);
 
-function clearRefreshTokenCookie(res: Response) {
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none'
-  });
-}
 
 export async function register(req: Request, res: Response, next: NextFunction) {
   try {
@@ -28,7 +24,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
 
     // 7 дней
-    const validityPeriodMs = 7 * 24 * 60 * 60 * 1000; 
+    const validityPeriodMs = 7 * 24 * 60 * 60 * 1000;
     const expiresAt = getTokenExpiryDate(validityPeriodMs);
     refreshTokenService.saveToken(user.id, tokenRefresh, expiresAt);
 
@@ -37,8 +33,9 @@ export async function register(req: Request, res: Response, next: NextFunction) 
       secure: true,
       sameSite: 'none',
       maxAge: validityPeriodMs,
-      signed:true
+      signed: true
     });
+
 
     res.status(201).json({ message: 'User registered', 'token Refresh ExpiresAt': expiresAt, tokenAccess });
 
@@ -51,7 +48,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 }
 export async function login(req: Request, res: Response, next: NextFunction) {
   console.log(req.body, 'DATA LOGIN');
-  
+
   try {
     const user = await userService.authenticateUser(req.body.email, req.body.password);
 
@@ -60,7 +57,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 
     // 7 дней
-    const validityPeriodMs = 7 * 24 * 60 * 60 * 1000; 
+    const validityPeriodMs = 7 * 24 * 60 * 60 * 1000;
     const expiresAt = getTokenExpiryDate(validityPeriodMs);
 
     refreshTokenService.saveToken(user.id, tokenRefresh, expiresAt);
@@ -71,11 +68,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       secure: true,
       sameSite: 'none',
       maxAge: validityPeriodMs,
-      signed:true
+      signed: true
     });
 
 
-    res.json({ message: 'User sign in', tokenRefreshExpiresAt: expiresAt, tokenAccess, tokenRefreshInDB: tokenRefresh, tokenRefreshInCookie: tokenRefresh });
+    res.status(200).json({ 
+      message: 'Login successful', 
+      tokenAccess,
+      tokenRefreshExpiresAt: expiresAt 
+    });
 
   } catch (err: any) {
     if (err.message === 'User with such email does not exist') {
@@ -94,7 +95,7 @@ export async function refreshAccessToken(req: Request, res: Response, next: Next
   try {
 
     console.log('COOKIES', req.signedCookies.refreshToken);
-    
+
 
     const refreshToken = req.signedCookies.refreshToken;
 
@@ -106,8 +107,8 @@ export async function refreshAccessToken(req: Request, res: Response, next: Next
 
     if (!payload || typeof payload === 'string') {
 
-    // clear if refreshToken not valid
-    clearRefreshTokenCookie(res);
+      // clear if refreshToken not valid
+      clearRefreshTokenCookie(res);
 
       return res.status(401).json({ message: "Invalid or expired refresh token" });
     }
@@ -133,8 +134,8 @@ export async function refreshAccessToken(req: Request, res: Response, next: Next
     }
 
     if (dbTokenRefresh.token !== refreshToken) {
-      // clearRefreshTokenCookie(res);
-      return res.status(401).json({ message: "Refresh token mismatch" , tokenRefreshCookie:refreshToken, dbTokenRefresh: dbTokenRefresh.token });
+      clearRefreshTokenCookie(res);
+      return res.status(401).json({ message: "Refresh token mismatch", tokenRefreshCookie: refreshToken, dbTokenRefresh: dbTokenRefresh.token });
     }
 
     if (dbTokenRefresh.revoked) {
@@ -143,9 +144,13 @@ export async function refreshAccessToken(req: Request, res: Response, next: Next
     }
 
     const newAccessToken = generateAccessToken({ userId: user.id, role: user.role, secret: JWT_ACCESS_SECRET });
-    
-    res.json({userName:user.fullName, userEmail:user.email, newAccessToken, refreshToken});
-    
+
+   res.status(200).json({ 
+      userId:user.id,
+      userName: user.fullName, 
+      userEmail: user.email, 
+      newAccessToken 
+    });
   } catch (err) {
     next(err);
   }
@@ -153,20 +158,55 @@ export async function refreshAccessToken(req: Request, res: Response, next: Next
 
 export async function logout(reg: Request, res: Response, next: NextFunction) {
 
-   try {
+  try {
 
     const refreshToken = reg.signedCookies.refreshToken;
     clearRefreshTokenCookie(res);
 
-    if(refreshToken) {
+    if (refreshToken) {
       const payload = verifyToken(refreshToken, JWT_REFRESH_SECRET);
       if (payload && typeof payload !== 'string') {
         await refreshTokenService.revokeToken(payload.userId);
       }
     }
 
-    res.json({ message: 'Logged out successfully' });
-   } catch (err) {
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
     next(err);
-   }
+  }
+}
+
+
+export async function activate(reg: Request, res: Response, next: NextFunction) {
+  try {
+
+    const token = reg.body.token;
+    if (!token) {
+      throw new Error('No activation token provided');
+    }
+
+    const result = await userService.activateEmail(token);
+
+    res.status(200).json({
+      message: 'Email activated successfully',
+      user: {
+        userId: result.id,
+        email: result.email,
+        fullName: result.fullName,
+        emailConfirmed: result.emailConfirmed
+      }
+    });
+
+  } catch (err: any) {
+    if (err.message === 'User already activated') {
+      err.status = 409;
+    } else if (err.message === 'Invalid or expired token') {
+      err.status = 400;
+    } else if (err.message === 'User not found') {
+      err.status = 404;
+    } else if (err.message === 'No activation token provided') {
+      err.status = 400;
+    }
+    next(err);
+  }
 }
